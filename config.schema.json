@@ -1,0 +1,28 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "type": "object",
+  "properties": {
+    "model_name": {"type": "string"},
+    "num_classes": {"type": "integer"},
+    "batch_size": {"type": "integer"},
+    "learning_rate": {"type": "number"},
+    "num_epochs": {"type": "integer"},
+    "input_size": {"type": "integer"},
+    "early_stopping_patience": {"type": "integer"},
+    "target_accuracy": {"type": "number"},
+    "train_data_path": {"type": "string"},
+    "val_data_path": {"type": "string"},
+    "test_data_path": {"type": "string"},
+    "checkpoint_dir": {"type": "string"},
+    "log_dir": {"type": "string"},
+    "augmentation": {"type": "boolean"}
+  },
+  "required": [
+    "model_name",
+    "num_classes",
+    "batch_size",
+    "learning_rate",
+    "num_epochs",
+    "input_size"
+  ]
+}
