@@ -95,6 +95,10 @@ def train_model(model, train_loader, val_loader, device, epochs,
             writer.add_scalar("Loss/val", val_loss, epoch)
             writer.add_scalar("Accuracy/train", train_acc, epoch)
             writer.add_scalar("Accuracy/val", val_acc, epoch)
+            writer.add_scalar("Train/Loss", train_loss, epoch)
+            writer.add_scalar("Train/Accuracy", train_acc, epoch)
+            writer.add_scalar("Val/Loss", val_loss, epoch)
+            writer.add_scalar("Val/Accuracy", val_acc, epoch)
 
         # Save latest model
         if checkpoint_dir:
