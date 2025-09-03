@@ -1,10 +1,9 @@
-
 from torch.utils.tensorboard import SummaryWriter
 import os
 import torch
 import torch.nn as nn
 import torch.optim as optim
-
+import matplotlib.pyplot as plt
 
 def train_model(model, train_loader, val_loader, device, epochs,
                 lr=0.001,
@@ -39,6 +38,17 @@ def train_model(model, train_loader, val_loader, device, epochs,
         best_val_acc = checkpoint.get('best_val_acc', 0.0)
         patience_counter = checkpoint.get('patience_counter', 0)
         print(f"Ripreso da checkpoint all'epoca {start_epoch}")
+
+    # Funzione per loggare Loss vs Accuracy come figura
+    def log_loss_vs_acc(tag, acc_list, loss_list, epoch):
+        fig, ax = plt.subplots()
+        ax.plot(acc_list, loss_list, marker='o')
+        ax.set_xlabel("Accuracy")
+        ax.set_ylabel("Loss")
+        ax.set_title(tag)
+        ax.grid(True, alpha=0.3)
+        writer.add_figure(tag, fig, global_step=epoch)
+        plt.close(fig)
 
     for epoch in range(start_epoch, epochs):
         model.train()
@@ -91,14 +101,19 @@ def train_model(model, train_loader, val_loader, device, epochs,
 
         # TensorBoard logging
         if writer:
-            writer.add_scalar("Loss/train", train_loss, epoch)
-            writer.add_scalar("Loss/val", val_loss, epoch)
-            writer.add_scalar("Accuracy/train", train_acc, epoch)
-            writer.add_scalar("Accuracy/val", val_acc, epoch)
+            # Grafici classici
             writer.add_scalar("Train/Loss", train_loss, epoch)
             writer.add_scalar("Train/Accuracy", train_acc, epoch)
             writer.add_scalar("Val/Loss", val_loss, epoch)
             writer.add_scalar("Val/Accuracy", val_acc, epoch)
+            #Comparazione grafici assieme
+            writer.add_scalars("Training Metrics",
+                   {"Loss": train_loss, "Accuracy": train_acc}, epoch)
+            writer.add_scalars("Validation Metrics",
+                   {"Loss": val_loss, "Accuracy": val_acc}, epoch)
+            # Grafico XY Loss vs Accuracy
+            log_loss_vs_acc("Train/Loss_vs_Accuracy", train_accs, train_losses, epoch)
+            log_loss_vs_acc("Val/Loss_vs_Accuracy", val_accs, val_losses, epoch)
 
         # Save latest model
         if checkpoint_dir:
@@ -137,6 +152,5 @@ def train_model(model, train_loader, val_loader, device, epochs,
 
     if writer:
         writer.close()
-
 
     return model, train_losses, val_losses, train_accs, val_accs
