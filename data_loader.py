@@ -1,11 +1,11 @@
 import os
 from torchvision import datasets
-from torch.utils.data import DataLoader
+from torch.utils.data import DataLoader, Subset
 from torchvision import transforms
 import torch
 from augmentation import get_data_transforms
 
-def get_data_loaders(data_dir, img_size=(224,224), batch_size=64):
+def get_data_loaders(data_dir, img_size=(224,224), batch_size=32):
     train_transform = transforms.Compose([
         transforms.RandomResizedCrop(img_size[0]),
         transforms.RandomHorizontalFlip(),
