@@ -18,6 +18,8 @@ def train_model(model, train_loader, val_loader, device, epochs,
 
     criterion = nn.CrossEntropyLoss()
     optimizer = optim.Adam(model.parameters(), lr=lr)
+
+    scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode='min', factor=0.5, patience=2)
     
     writer = SummaryWriter(log_dir) if log_dir else None
 
@@ -39,7 +41,7 @@ def train_model(model, train_loader, val_loader, device, epochs,
         patience_counter = checkpoint.get('patience_counter', 0)
         print(f"Ripreso da checkpoint all'epoca {start_epoch}")
 
-    # Funzione per loggare Loss vs Accuracy come figura
+    # Funzione per loggare Loss vs Accuracy come immagine
     def log_loss_vs_acc(tag, acc_list, loss_list, epoch):
         fig, ax = plt.subplots()
         ax.plot(acc_list, loss_list, marker='o')
@@ -89,6 +91,8 @@ def train_model(model, train_loader, val_loader, device, epochs,
         val_loss /= val_total
         val_acc = val_correct / val_total
 
+        scheduler.step(val_loss)
+
         # Salva metriche
         train_losses.append(train_loss)
         val_losses.append(val_loss)
@@ -102,18 +106,11 @@ def train_model(model, train_loader, val_loader, device, epochs,
         # TensorBoard logging
         if writer:
             # Grafici classici
-            writer.add_scalar("Train/Loss", train_loss, epoch)
-            writer.add_scalar("Train/Accuracy", train_acc, epoch)
-            writer.add_scalar("Val/Loss", val_loss, epoch)
-            writer.add_scalar("Val/Accuracy", val_acc, epoch)
-            #Comparazione grafici assieme
-            writer.add_scalars("Training Metrics",
-                   {"Loss": train_loss, "Accuracy": train_acc}, epoch)
-            writer.add_scalars("Validation Metrics",
-                   {"Loss": val_loss, "Accuracy": val_acc}, epoch)
-            # Grafico XY Loss vs Accuracy
-            log_loss_vs_acc("Train/Loss_vs_Accuracy", train_accs, train_losses, epoch)
-            log_loss_vs_acc("Val/Loss_vs_Accuracy", val_accs, val_losses, epoch)
+            writer.add_scalar("Loss/Train", train_loss, epoch)
+            writer.add_scalar("Loss/Val", val_loss, epoch)
+            
+            writer.add_scalar("Accuracy/Train", train_acc, epoch)
+            writer.add_scalar("Accuracy/Val", val_acc, epoch)
 
         # Save latest model
         if checkpoint_dir:

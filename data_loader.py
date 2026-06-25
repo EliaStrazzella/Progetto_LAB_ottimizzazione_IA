@@ -29,20 +29,21 @@ def get_data_loaders(data_dir, img_size=(224,224), batch_size=32):
     train_dataset = datasets.ImageFolder(train_dir, transform=train_transform)
     val_dataset = datasets.ImageFolder(val_dir, transform=val_transform)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
     class_names = train_dataset.classes
 
     return train_loader, val_loader, class_names
 
 def load_plantvillage_data(data_dir, img_size=(224, 224), batch_size=64, val_split=0.2, seed=42):
-    train_transform, val_transform = get_data_transforms()
+    train_transform, val_transform = get_data_transforms(img_size[0])
 
     dataset = datasets.ImageFolder(data_dir)
     num_data = len(dataset)
     indices = list(range(num_data))
-
+    
+    #Calcolo Immagini da usare
     split = int(val_split * num_data)
 
     torch.manual_seed(seed)
@@ -54,7 +55,7 @@ def load_plantvillage_data(data_dir, img_size=(224, 224), batch_size=64, val_spl
     train_sampler = torch.utils.data.SubsetRandomSampler(train_idx)
     val_sampler = torch.utils.data.SubsetRandomSampler(val_idx)
 
-    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler)
-    val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler)
+    train_loader = DataLoader(train_dataset, batch_size=batch_size, sampler=train_sampler, num_workers=2)
+    val_loader = DataLoader(val_dataset, batch_size=batch_size, sampler=val_sampler, num_workers=2)
 
     return train_loader, val_loader, dataset.classes

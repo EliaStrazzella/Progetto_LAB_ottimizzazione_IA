@@ -3,6 +3,7 @@ import numpy as np
 import seaborn as sns
 import torch
 import os
+import time
 from sklearn.metrics import confusion_matrix, classification_report
 from PIL import Image
 from collections import defaultdict
@@ -34,6 +35,8 @@ def evaluate_model(model, dataloader, device, class_names):
     all_preds = []
     all_labels = []
 
+    start_time = time.time()
+
     with torch.no_grad():
         for inputs, labels in dataloader:
             inputs, labels = inputs.to(device), labels.to(device)
@@ -41,6 +44,13 @@ def evaluate_model(model, dataloader, device, class_names):
             _, preds = torch.max(outputs, 1)
             all_preds.extend(preds.cpu().numpy())
             all_labels.extend(labels.cpu().numpy())
+
+    end_time = time.time() 
+    inference_time = end_time - start_time
+
+    print(f" Tempo di Inferenza totale sul set: {inference_time:.2f} secondi")
+    print(f" Tempo medio per batch: {inference_time/len(dataloader):.4f} secondi")
+    print("-" * 30)
 
     print("Classification Report:")
     print(classification_report(all_labels, all_preds, target_names=class_names))
@@ -75,7 +85,7 @@ def plot_distribution(distribution_dict, title):
     plt.tight_layout()
     plt.show()
 def visualize_sample_images(dataset_path, class_name=None, num_images=2):
- 
+
     # Se class_name non è specificato, prendi la prima classe trovata
     class_dir = os.path.join(dataset_path, class_name) if class_name else None
     if not class_dir or not os.path.exists(class_dir):
@@ -122,21 +132,21 @@ def plot_leaf_type_pie_chart(dataset_dir):
         if not os.path.isdir(class_path):
             continue
 
-        # Estrai il prefisso
+        #Estrai il prefisso
         prefix = class_name.split('_')[0].lower()
         if prefix not in prefix_map:
             continue  # ignora classi non mappate
 
         leaf_type = prefix_map[prefix]
 
-        # Conta immagini valide
+        #Conta immagini valide
         image_count = len([
             f for f in os.listdir(class_path)
             if f.lower().endswith(('.jpg', '.jpeg', '.png'))
         ])
         type_counts[leaf_type] += image_count
 
-    # Se vuoto
+    # Sevuoto
     if not type_counts:
         print("❌ Nessuna immagine trovata per Tomato, Potato o Pepper.")
         return
