@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 
 def train_model(model, train_loader, val_loader, device, epochs,
                 lr=0.001,
-                early_stopping_patience=5,
+                early_stopping_patience=3,
                 target_accuracy=None,
                 checkpoint_dir=None,
                 resume_from=None,
@@ -40,17 +40,6 @@ def train_model(model, train_loader, val_loader, device, epochs,
         best_val_acc = checkpoint.get('best_val_acc', 0.0)
         patience_counter = checkpoint.get('patience_counter', 0)
         print(f"Ripreso da checkpoint all'epoca {start_epoch}")
-
-    # Funzione per loggare Loss vs Accuracy come immagine
-    def log_loss_vs_acc(tag, acc_list, loss_list, epoch):
-        fig, ax = plt.subplots()
-        ax.plot(acc_list, loss_list, marker='o')
-        ax.set_xlabel("Accuracy")
-        ax.set_ylabel("Loss")
-        ax.set_title(tag)
-        ax.grid(True, alpha=0.3)
-        writer.add_figure(tag, fig, global_step=epoch)
-        plt.close(fig)
 
     for epoch in range(start_epoch, epochs):
         model.train()
@@ -134,8 +123,8 @@ def train_model(model, train_loader, val_loader, device, epochs,
                     'best_val_acc': best_val_acc,
                     'patience_counter': patience_counter
                 }, os.path.join(checkpoint_dir, 'model_best.pth'))
-            else:
-                patience_counter += 1 
+        else:
+            patience_counter += 1 
 
         # Early stopping
         if early_stopping_patience and patience_counter >= early_stopping_patience:

@@ -45,7 +45,7 @@ class CustomCNN(nn.Module):
 
 
 class TransferMobileNet(nn.Module):
-    def __init__(self, num_classes=13, fine_tune_at=100):
+    def __init__(self, num_classes=13, fine_tune_at=15):
         super(TransferMobileNet, self).__init__()
 
         self.base_model = models.mobilenet_v2(weights='IMAGENET1K_V1')

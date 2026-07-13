@@ -104,7 +104,7 @@ def visualize_sample_images(dataset_path, class_name=None, num_images=2):
         return
 
     # Visualizza immagini
-    fig, axes = plt.subplots(1, len(image_files), figsize=(5 * len(image_files), 5))
+    _, axes = plt.subplots(1, len(image_files), figsize=(5 * len(image_files), 5))
     if len(image_files) == 1:
         axes = [axes]  # per compatibilità
 
