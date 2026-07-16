@@ -25,16 +25,19 @@ def get_data_loaders(data_dir, img_size=(224,224), batch_size=32):
 
     train_dir = os.path.join(data_dir, 'train')
     val_dir = os.path.join(data_dir, 'val')
+    test_dir = os.path.join(data_dir, 'test')
 
     train_dataset = datasets.ImageFolder(train_dir, transform=train_transform)
     val_dataset = datasets.ImageFolder(val_dir, transform=val_transform)
+    test_dataset = datasets.ImageFolder(test_dir, transform=val_transform)
 
     train_loader = DataLoader(train_dataset, batch_size=batch_size, shuffle=True, num_workers=2)
     val_loader = DataLoader(val_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
+    test_loader = DataLoader(test_dataset, batch_size=batch_size, shuffle=False, num_workers=2)
 
     class_names = train_dataset.classes
 
-    return train_loader, val_loader, class_names
+    return train_loader, val_loader,test_loader, class_names
 
 def load_plantvillage_data(data_dir, img_size=(224, 224), batch_size=64, val_split=0.2, seed=42):
     train_transform, val_transform = get_data_transforms(img_size[0])
